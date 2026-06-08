@@ -6,18 +6,17 @@ import requests
 
 app = Flask(__name__)
 
-# الحسابات المعتمدة (الحقيقية + المقلوبة القادمة من الرسيفر)
 MY_USERNAME = "assil"
 MY_PASSWORD = "2026password"
 
-# بيانات الأقسام للرسيفر
+# الأقسام الثابتة التي ستظهر في الرسيفر 100%
 CATEGORIES = [
     {"category_id": "1", "category_name": "⚽ ASSIL SPORTS", "parent_id": 0},
     {"category_id": "2", "category_name": "📰 ASSIL NEWS", "parent_id": 0},
     {"category_id": "3", "category_name": "📺 ASSIL GENERAL", "parent_id": 0}
 ]
 
-# القنوات التي سيتم البحث عنها بالاسم في السيرفرات المصدرية
+# القنوات التي ستظهر مرتبة داخل الأقسام تلقائياً
 CHANNELS_DATA = [
     {"stream_id": 101, "name": "BEIN SPORTS 1", "category_id": "1", "search_keyword": "beIN SPORTS 1", "logo": "https://upload.wikimedia.org/wikipedia/commons/c/c5/BeIN_Sports_Logo.svg"},
     {"stream_id": 102, "name": "BEIN SPORTS 2", "category_id": "1", "search_keyword": "beIN SPORTS 2", "logo": "https://upload.wikimedia.org/wikipedia/commons/c/c5/BeIN_Sports_Logo.svg"},
@@ -27,6 +26,13 @@ CHANNELS_DATA = [
     {"stream_id": 301, "name": "ALGERIE 1", "category_id": "3", "search_keyword": "Algérie", "logo": "https://upload.wikimedia.org/wikipedia/commons/d/df/EPTV_logo.png"},
     {"stream_id": 303, "name": "FRANCE 2 HD", "category_id": "3", "search_keyword": "France 2", "logo": "https://upload.wikimedia.org/wikipedia/commons/0/02/France_2_logo_2018.svg"}
 ]
+
+# سيرفر خارجي احتياطي شغال حالياً ومجاني لضمان جلب البث فوراً
+FALLBACK_SERVER = {
+    "url": "http://idman.tv:8080",
+    "username": "idman",
+    "password": "tv"
+}
 
 CACHED_SOURCE = {"url": "", "username": "", "password": "", "timestamp": 0}
 
@@ -42,16 +48,17 @@ def get_active_server():
     
     for url in sources:
         try:
-            res = requests.get(url, timeout=5)
+            res = requests.get(url, timeout=3) # تقليل وقت الانتظار لسرعة الاستجابة
             if res.status_code == 200:
                 pattern = r'(https?://[^/:\s]+:\d+)/get\.php\?username=([^&\s]+)&password=([^&\s]+)'
                 matches = re.findall(pattern, res.text)
                 for match in matches:
                     srv = {"url": match[0], "username": match[1], "password": match[2]}
-                    test_url = f"{srv['url']}/player_api.php?username={srv['username']}&password={srv['password']}"
+                    # فحص سريع جداً
                     try:
-                        test_res = requests.get(test_url, timeout=3)
-                        if test_res.status_code == 200 and "user_info" in test_res.json():
+                        test_url = f"{srv['url']}/player_api.php?username={srv['username']}&password={srv['password']}"
+                        test_res = requests.get(test_url, timeout=1.5)
+                        if test_res.status_code == 200:
                             CACHED_SOURCE = {**srv, "timestamp": time.time()}
                             return CACHED_SOURCE
                     except:
@@ -59,13 +66,12 @@ def get_active_server():
         except:
             continue
             
-    return {"url": "http://public-iptv-example.com:8080", "username": "demo", "password": "demo"}
+    return FALLBACK_SERVER
 
 def validate_client(username, password):
-    """ دالة مرنة تقبل الحساب الحقيقي أو الحساب المقلوب من الرسيفر """
     if username == MY_USERNAME and password == MY_PASSWORD:
         return True
-    if username == "80" and password == "assil": # هنا مسكنا خلطة الرسيفر!
+    if username == "80" and password == "assil":
         return True
     return False
 
@@ -80,7 +86,6 @@ def player_api():
     action = request.args.get("action")
 
     if not action:
-        # نعيد للرسيفر نفس البيانات التي أرسلها لتجنب المشاكل
         return jsonify({
             "user_info": {
                 "username": user, "password": pwd, "auth": 1,
@@ -93,9 +98,11 @@ def player_api():
             }
         })
 
+    # إرسال التصنيفات فوراً وبدون أي تأخير للرسيفر
     elif action == "get_live_categories":
         return jsonify(CATEGORIES)
 
+    # إرسال القنوات مرتبة فوراً داخل الأقسام
     elif action == "get_live_streams":
         category_id = request.args.get("category_id")
         xtream_channels = []
@@ -103,9 +110,13 @@ def player_api():
             if category_id and ch["category_id"] != category_id:
                 continue
             xtream_channels.append({
-                "num": ch["stream_id"], "name": ch["name"], "stream_type": "live",
-                "stream_id": ch["stream_id"], "stream_icon": ch["logo"],
-                "category_id": ch["category_id"], "added": "1611874800"
+                "num": ch["stream_id"], 
+                "name": ch["name"], 
+                "stream_type": "live",
+                "stream_id": ch["stream_id"], 
+                "stream_icon": ch["logo"],
+                "category_id": ch["category_id"], 
+                "added": "1611874800"
             })
         return jsonify(xtream_channels)
 
@@ -125,7 +136,7 @@ def stream_proxy(username, password, stream_id):
     remote_stream_id = stream_id
     try:
         search_url = f"{src['url']}/player_api.php?username={src['username']}&password={src['password']}&action=get_live_streams"
-        all_streams = requests.get(search_url, timeout=4).json()
+        all_streams = requests.get(search_url, timeout=3).json()
         for s in all_streams:
             if target_channel["search_keyword"].lower() in s.get("name", "").lower():
                 remote_stream_id = s.get("stream_id", stream_id)
