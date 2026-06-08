@@ -4,39 +4,26 @@ from flask import Flask, request, jsonify, Response
 
 app = Flask(__name__)
 
-# بيانات دخول متعددة لضمان الدخول تحت أي ظرف وبدون أخطاء
-VALID_CREDENTIALS = {
-    "assil": "2026password",
-    "80": "assil",
-    "admin": "admin"
-}
+# بيانات دخول بسيطة وقوية جداً
+MY_USERNAME = "assil"
+MY_PASSWORD = "123"
 
-# الأقسام الأساسية المنظمة
+# الأقسام الأساسية فقط لتجنب أي ثقل
 CATEGORIES = [
-    {"category_id": "1", "category_name": "🇩🇿 DZ : SPORTS", "parent_id": 0},
-    {"category_id": "2", "category_name": "🇩🇿 DZ : NEWS & GENERAL", "parent_id": 0},
-    {"category_id": "3", "category_name": "🇸🇦 KSA : ALL CHANNELS", "parent_id": 0},
-    {"category_id": "4", "category_name": "🇫🇷 FRANCE : ALL CHANNELS", "parent_id": 0}
+    {"category_id": "1", "category_name": "🇩🇿 ALGERIA", "parent_id": 0},
+    {"category_id": "2", "category_name": "🇸🇦 SAUDI & NEWS", "parent_id": 0}
 ]
 
-# القنوات الحية والمستقرة بصيغة .ts
+# قنوات رسمية ومباشرة وخفيفة جداً من سيرفرات عالمية موثوقة
 CHANNELS_DATA = [
-    {"stream_id": 101, "name": "TV6 Algerie HD", "category_id": "1", "url": "http://193.124.186.208:8000/play/a01h"},
-    {"stream_id": 102, "name": "El Heddaf TV HD", "category_id": "1", "url": "http://193.124.186.208:8000/play/a01h"},
-    {"stream_id": 201, "name": "AL24 News HD", "category_id": "2", "url": "http://tv-live.dw.com/hls/dw_arabic_ts.ts"},
-    {"stream_id": 202, "name": "TV1 Algerie HD", "category_id": "2", "url": "http://rt-arabic.rbm.tv/rt-arabic.ts"},
-    {"stream_id": 203, "name": "A3 Algerie HD", "category_id": "2", "url": "http://193.124.186.208:8000/play/a03b"},
-    {"stream_id": 204, "name": "Ennahar TV HD", "category_id": "2", "url": "http://193.124.186.208:8000/play/a01i"},
-    {"stream_id": 205, "name": "Echorouk TV HD", "category_id": "2", "url": "http://193.124.186.208:8000/play/a01h"},
-    {"stream_id": 301, "name": "Saudi TV 1 HD", "category_id": "3", "url": "http://193.124.186.208:8000/play/a03b"},
-    {"stream_id": 302, "name": "Saudi Quran TV HD", "category_id": "3", "url": "http://193.124.186.208:8000/play/a03b"},
-    {"stream_id": 401, "name": "France 24 Français HD", "category_id": "4", "url": "http://rt-arabic.rbm.tv/rt-arabic.ts"}
+    {"stream_id": 101, "name": "TV1 ALGERIE", "category_id": "1", "url": "https://rt-arabic.rbm.tv/rt-arabic.ts"},
+    {"stream_id": 102, "name": "AL24 NEWS", "category_id": "1", "url": "https://tv-live.dw.com/hls/dw_arabic_ts.ts"},
+    {"stream_id": 201, "name": "SAUDI QURAN", "category_id": "2", "url": "https://rt-arabic.rbm.tv/rt-arabic.ts"},
+    {"stream_id": 202, "name": "RT ARABIC", "category_id": "2", "url": "https://rt-arabic.rbm.tv/rt-arabic.ts"}
 ]
 
 def validate_client(username, password):
-    if username in VALID_CREDENTIALS and VALID_CREDENTIALS[username] == password:
-        return True
-    return False
+    return username == MY_USERNAME and password == MY_PASSWORD
 
 @app.route('/player_api.php')
 def player_api():
