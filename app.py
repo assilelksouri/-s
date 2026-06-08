@@ -5,73 +5,99 @@ from flask import Flask, request, jsonify, Response
 app = Flask(__name__)
 handler = app
 
-# بيانات الدخول المعتمدة (يمكنك استخدام أي منهما)
+# بيانات الدخول المعتمدة
 VALID_CREDENTIALS = {"assil": "123", "admin": "admin"}
 
-# الأقسام الـ 9 المنظمة بالكامل للدول الثلاث
+# الأقسام الرسمية بناءً على ملف IPTV_Categories_2026.txt
 CATEGORIES = [
-    {"category_id": "1", "category_name": "🇩🇿 DZ : SPORTS & FOOTBALL", "parent_id": 0},
-    {"category_id": "2", "category_name": "🇩🇿 DZ : NEWS & EXTRA", "parent_id": 0},
-    {"category_id": "3", "category_name": "🇩🇿 DZ : GENERAL & ENTERTAINMENT", "parent_id": 0},
-    {"category_id": "4", "category_name": "🇸🇦 KSA : SPORTS", "parent_id": 0},
-    {"category_id": "5", "category_name": "🇸🇦 KSA : NEWS", "parent_id": 0},
-    {"category_id": "6", "category_name": "🇸🇦 KSA : GENERAL & ENTERTAINMENT", "parent_id": 0},
-    {"category_id": "7", "category_name": "🇫🇷 FR : SPORTS", "parent_id": 0},
-    {"category_id": "8", "category_name": "🇫🇷 FR : NEWS", "parent_id": 0},
-    {"category_id": "9", "category_name": "🇫🇷 FR : GENERAL & ENTERTAINMENT", "parent_id": 0}
+    {"category_id": "1", "category_name": "FR | GENERAL", "parent_id": 0},
+    {"category_id": "2", "category_name": "FR | NEWS", "parent_id": 0},
+    {"category_id": "3", "category_name": "FR | SPORT", "parent_id": 0},
+    {"category_id": "4", "category_name": "DZ | NATIONAL", "parent_id": 0},
+    {"category_id": "5", "category_name": "AR | NEWS", "parent_id": 0},
+    {"category_id": "6", "category_name": "AR | ISLAMIC", "parent_id": 0},
+    {"category_id": "7", "category_name": "BEIN | SPORTS", "parent_id": 0},
+    {"category_id": "8", "category_name": "SSC | SPORTS", "parent_id": 0},
+    {"category_id": "9", "category_name": "AR | SPORT", "parent_id": 0},
+    {"category_id": "10", "category_name": "KIDS | INTERNATIONAL", "parent_id": 0},
+    {"category_id": "11", "category_name": "DOCUMENTARY | WORLD", "parent_id": 0},
+    {"category_id": "12", "category_name": "MUSIC | WORLD", "parent_id": 0},
+    {"category_id": "13", "category_name": "MOVIES | CHANNELS", "parent_id": 0}
 ]
 
-# روابط البث الأساسية المستقرة
-TS_STREAM = "http://rt-arabic.rbm.tv/rt-arabic.ts"
-KSA_QURAN = "https://win.holol.com/live/quran/playlist.m3u8"
-KSA_SUNNAH = "https://win.holol.com/live/sunnah/playlist.m3u8"
-ALARABIYA = "https://live.alarabiya.net/alarabiya/alarabiya.m3u8"
+# مصادر البث الحية والمستقرة
+STREAM_TS = "http://rt-arabic.rbm.tv/rt-arabic.ts"
+STREAM_QURAN = "https://win.holol.com/live/quran/playlist.m3u8"
+STREAM_SUNNAH = "https://win.holol.com/live/sunnah/playlist.m3u8"
+STREAM_NEWS = "https://live.alarabiya.net/alarabiya/alarabiya.m3u8"
 
-# قائمة القنوات كاملة وموزعة بدقة على الأقسام
 CHANNELS_DATA = [
-    # ==================== الجزائر (DZ) ====================
-    {"stream_id": 101, "name": "TV6 Algerie HD", "category_id": "1", "url": TS_STREAM},
-    {"stream_id": 104, "name": "Programme National HD (الأرضية)", "category_id": "1", "url": TS_STREAM},
-    {"stream_id": 106, "name": "El Heddaf TV HD", "category_id": "1", "url": TS_STREAM},
-    {"stream_id": 108, "name": "Stade News TV", "category_id": "1", "url": TS_STREAM},
-    {"stream_id": 109, "name": "Dzair Sport HD", "category_id": "1", "url": TS_STREAM},
+    # ------ FR | GENERAL ------
+    {"stream_id": 1001, "name": "TF1", "category_id": "1", "url": STREAM_TS},
+    {"stream_id": 1002, "name": "France 2", "category_id": "1", "url": STREAM_TS},
+    {"stream_id": 1003, "name": "France 3", "category_id": "1", "url": STREAM_TS},
+    {"stream_id": 1006, "name": "M6", "category_id": "1", "url": STREAM_TS},
+    {"stream_id": 1010, "name": "W9", "category_id": "1", "url": STREAM_TS},
     
-    {"stream_id": 131, "name": "AL24 News HD", "category_id": "2", "url": TS_STREAM},
-    {"stream_id": 136, "name": "Ennahar TV HD", "category_id": "2", "url": TS_STREAM},
-    {"stream_id": 139, "name": "Echorouk News HD", "category_id": "2", "url": TS_STREAM},
-    {"stream_id": 142, "name": "El Bilad TV HD", "category_id": "2", "url": TS_STREAM},
-    
-    {"stream_id": 181, "name": "TV1 Algerie HD", "category_id": "3", "url": TS_STREAM},
-    {"stream_id": 183, "name": "Canal Algerie HD", "category_id": "3", "url": TS_STREAM},
-    {"stream_id": 185, "name": "A3 Algerie HD", "category_id": "3", "url": TS_STREAM},
-    {"stream_id": 187, "name": "Echorouk TV HD", "category_id": "3", "url": TS_STREAM},
-    {"stream_id": 190, "name": "El Fadjr TV HD", "category_id": "3", "url": TS_STREAM},
+    # ------ FR | NEWS ------
+    {"stream_id": 2001, "name": "BFM TV", "category_id": "2", "url": STREAM_TS},
+    {"stream_id": 2002, "name": "CNews", "category_id": "2", "url": STREAM_TS},
+    {"stream_id": 2005, "name": "France 24 FR", "category_id": "2", "url": STREAM_NEWS},
 
-    # ==================== المملكة العربية السعودية (KSA) ====================
-    {"stream_id": 401, "name": "SSC 1 HD", "category_id": "4", "url": KSA_QURAN},
-    {"stream_id": 413, "name": "KSA Sports 1 HD", "category_id": "4", "url": KSA_SUNNAH},
-    {"stream_id": 415, "name": "KSA Sports 2 HD", "category_id": "4", "url": KSA_SUNNAH},
+    # ------ FR | SPORT ------
+    {"stream_id": 3001, "name": "Canal+ Sport", "category_id": "3", "url": STREAM_TS},
+    {"stream_id": 3002, "name": "Canal+ Foot", "category_id": "3", "url": STREAM_TS},
+    {"stream_id": 3004, "name": "beIN Sports 1 FR", "category_id": "3", "url": STREAM_TS},
 
-    {"stream_id": 501, "name": "Al Arabiya HD", "category_id": "5", "url": ALARABIYA},
-    {"stream_id": 504, "name": "Al Arabiya Al Hadath HD", "category_id": "5", "url": ALARABIYA},
-    {"stream_id": 506, "name": "Al Ekhbariya HD", "category_id": "5", "url": KSA_SUNNAH},
+    # ------ DZ | NATIONAL ------
+    {"stream_id": 4001, "name": "TV1 Algérie", "category_id": "4", "url": STREAM_TS},
+    {"stream_id": 4002, "name": "Canal Algérie", "category_id": "4", "url": STREAM_TS},
+    {"stream_id": 4003, "name": "Algérie 3", "category_id": "4", "url": STREAM_TS},
+    {"stream_id": 4006, "name": "TV6 Jeunesse", "category_id": "4", "url": STREAM_TS},
+    {"stream_id": 4011, "name": "Echourouk TV", "category_id": "4", "url": STREAM_TS},
+    {"stream_id": 4012, "name": "Echourouk News", "category_id": "4", "url": STREAM_TS},
+    {"stream_id": 4013, "name": "Ennahar TV", "category_id": "4", "url": STREAM_TS},
+    {"stream_id": 4014, "name": "El Bilad TV", "category_id": "4", "url": STREAM_TS},
+    {"stream_id": 4020, "name": "Bahia TV", "category_id": "4", "url": STREAM_TS},
+    {"stream_id": 4022, "name": "El Heddaf TV", "category_id": "4", "url": STREAM_TS},
 
-    {"stream_id": 601, "name": "Saudi TV 1 HD", "category_id": "6", "url": KSA_QURAN},
-    {"stream_id": 603, "name": "SBC HD", "category_id": "6", "url": KSA_SUNNAH},
-    {"stream_id": 605, "name": "MBC 1 HD", "category_id": "6", "url": ALARABIYA},
+    # ------ AR | NEWS ------
+    {"stream_id": 5003, "name": "Al Arabiya", "category_id": "5", "url": STREAM_NEWS},
+    {"stream_id": 5004, "name": "Al Hadath", "category_id": "5", "url": STREAM_NEWS},
+    {"stream_id": 5009, "name": "RT Arabic", "category_id": "5", "url": STREAM_TS},
+    {"stream_id": 5014, "name": "Al Ikhbariya", "category_id": "5", "url": STREAM_SUNNAH},
 
-    # ==================== فرنسا (FRANCE) ====================
-    {"stream_id": 701, "name": "Canal+ Foot HD", "category_id": "7", "url": TS_STREAM},
-    {"stream_id": 703, "name": "Canal+ Sport HD", "category_id": "7", "url": TS_STREAM},
-    {"stream_id": 706, "name": "beIN Sports FR 1 HD", "category_id": "7", "url": TS_STREAM},
+    # ------ AR | ISLAMIC ------
+    {"stream_id": 6001, "name": "Saudi Quran TV", "category_id": "6", "url": STREAM_QURAN},
+    {"stream_id": 6002, "name": "Saudi Sunnah TV", "category_id": "6", "url": STREAM_SUNNAH},
 
-    {"stream_id": 801, "name": "BFM TV HD", "category_id": "8", "url": TS_STREAM},
-    {"stream_id": 808, "name": "CNews HD", "category_id": "8", "url": TS_STREAM},
-    {"stream_id": 811, "name": "France 24 Français HD", "category_id": "8", "url": ALARABIYA},
+    # ------ BEIN | SPORTS ------
+    {"stream_id": 7001, "name": "beIN SPORTS 1", "category_id": "7", "url": STREAM_TS},
+    {"stream_id": 7002, "name": "beIN SPORTS 2", "category_id": "7", "url": STREAM_TS},
+    {"stream_id": 7010, "name": "beIN SPORTS NEWS", "category_id": "7", "url": STREAM_NEWS},
 
-    {"stream_id": 901, "name": "TF1 HD", "category_id": "9", "url": TS_STREAM},
-    {"stream_id": 906, "name": "France 2 HD", "category_id": "9", "url": TS_STREAM},
-    {"stream_id": 917, "name": "M6 HD", "category_id": "9", "url": TS_STREAM}
+    # ------ SSC | SPORTS ------
+    {"stream_id": 8001, "name": "SSC 1", "category_id": "8", "url": STREAM_QURAN},
+    {"stream_id": 8002, "name": "SSC 2", "category_id": "8", "url": STREAM_QURAN},
+
+    # ------ AR | SPORT ------
+    {"stream_id": 9001, "name": "Abu Dhabi Sports 1", "category_id": "9", "url": STREAM_TS},
+    {"stream_id": 9004, "name": "Dubai Sports 1", "category_id": "9", "url": STREAM_TS},
+
+    # ------ KIDS | INTERNATIONAL ------
+    {"stream_id": 10001, "name": "Cartoon Network", "category_id": "10", "url": STREAM_TS},
+    {"stream_id": 10007, "name": "Gulli", "category_id": "10", "url": STREAM_TS},
+
+    # ------ DOCUMENTARY | WORLD ------
+    {"stream_id": 11003, "name": "National Geographic", "category_id": "11", "url": STREAM_TS},
+
+    # ------ MUSIC | WORLD ------
+    {"stream_id": 12001, "name": "MTV", "category_id": "12", "url": STREAM_TS},
+
+    # ------ MOVIES | CHANNELS ------
+    {"stream_id": 13001, "name": "MOVIES | CHANNEL 1", "category_id": "13", "url": STREAM_NEWS},
+    {"stream_id": 13002, "name": "MOVIES | CHANNEL 2", "category_id": "13", "url": STREAM_NEWS},
+    {"stream_id": 13003, "name": "MOVIES | CHANNEL 3", "category_id": "13", "url": STREAM_NEWS}
 ]
 
 def validate_client(username, password):
@@ -82,13 +108,11 @@ def player_api():
     user = request.args.get("username")
     pwd = request.args.get("password")
     
-    # إرجاع كود 200 دائماً لتجنب اعتبار الرسيفر للـ 403 كخطأ في الشبكة
     if not user or not pwd or not validate_client(user, pwd):
         return jsonify({"user_info": {"auth": 0}}), 200
 
     action = request.args.get("action")
     
-    # طلب تسجيل الدخول والتحقق الأساسي
     if not action:
         return jsonify({
             "user_info": {
@@ -96,7 +120,7 @@ def player_api():
                 "password": pwd,
                 "auth": 1,
                 "status": "Active",
-                "exp_date": 1803744000,  # طابع زمني رقمي (سنة 2027) لمنع الـ Echec
+                "exp_date": 1803744000,
                 "is_trial": 0,
                 "active_cons": 0,
                 "max_connections": 5
@@ -110,11 +134,9 @@ def player_api():
             }
         })
         
-    # طلب جلب تصنيفات البث المباشر
     elif action == "get_live_categories":
         return jsonify(CATEGORIES)
         
-    # طلب جلب قنوات قسم معين
     elif action == "get_live_streams":
         category_id = request.args.get("category_id")
         streams = []
@@ -134,7 +156,6 @@ def player_api():
         
     return jsonify([])
 
-# مسارات البث المباشر المدعومة من الرسيفرات
 @app.route('/live/<username>/<password>/<int:stream_id>.ts')
 @app.route('/live/<username>/<password>/<int:stream_id>')
 def stream_proxy(username, password, stream_id):
@@ -144,7 +165,7 @@ def stream_proxy(username, password, stream_id):
     target_channel = next((ch for ch in CHANNELS_DATA if ch["stream_id"] == stream_id), None)
     if target_channel:
         base_url = target_channel["url"]
-        # خدعة كسر الكاش الذكية لضمان عمل القنوات المتشابهة في نفس الوقت دون تكرار
+        # توجيه 302 فوري: يرفع الضغط تماماً عن Vercel ويمنع انطفاءه
         separator = "&" if "?" in base_url else "?"
         final_url = f"{base_url}{separator}ts={int(time.time())}"
         return Response(status=302, headers={"Location": final_url})
