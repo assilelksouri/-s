@@ -4,6 +4,9 @@ from flask import Flask, request, jsonify, Response
 
 app = Flask(__name__)
 
+# أضف هذا السطر هنا ليتعرف عليه Vercel كـ handler رئيسي ومباشر
+handler = app
+
 # بيانات الدخول الثابتة والسريعة
 VALID_CREDENTIALS = {"assil": "123", "admin": "admin"}
 
@@ -240,4 +243,122 @@ CHANNELS_DATA = [
     {"stream_id": 715, "name": "beIN Sports FR MAX 9 HD", "category_id": "7", "url": TS_STREAM},
     {"stream_id": 716, "name": "beIN Sports FR MAX 10 HD", "category_id": "7", "url": TS_STREAM},
     {"stream_id": 717, "name": "Eurosport 1 France HD", "category_id": "7", "url": TS_STREAM},
-    {"stream_id": 718, "name": "Eurosport 2
+    {"stream_id": 718, "name": "Eurosport 2 France HD", "category_id": "7", "url": TS_STREAM},
+    {"stream_id": 719, "name": "Eurosport 4K France", "category_id": "7", "url": TS_STREAM},
+    {"stream_id": 720, "name": "RMC Sport Live 2", "category_id": "7", "url": TS_STREAM},
+    {"stream_id": 721, "name": "RMC Sport Live 3", "category_id": "7", "url": TS_STREAM},
+    {"stream_id": 722, "name": "RMC Sport Live 4", "category_id": "7", "url": TS_STREAM},
+    {"stream_id": 723, "name": "L'Équipe TV HD", "category_id": "7", "url": TS_STREAM},
+    {"stream_id": 724, "name": "L'Équipe TV SD", "category_id": "7", "url": TS_STREAM},
+    {"stream_id": 725, "name": "Automoto TV HD", "category_id": "7", "url": TS_STREAM},
+    {"stream_id": 726, "name": "Equidia HD", "category_id": "7", "url": TS_STREAM},
+    {"stream_id": 727, "name": "OL Play", "category_id": "7", "url": TS_STREAM},
+    {"stream_id": 728, "name": "OM Play", "category_id": "7", "url": TS_STREAM},
+    {"stream_id": 729, "name": "PSG TV", "category_id": "7", "url": TS_STREAM},
+
+    # === 8. FR : NEWS ===
+    {"stream_id": 801, "name": "BFM TV HD", "category_id": "8", "url": TS_STREAM},
+    {"stream_id": 802, "name": "BFM TV 4K", "category_id": "8", "url": TS_STREAM},
+    {"stream_id": 803, "name": "BFM Business", "category_id": "8", "url": TS_STREAM},
+    {"stream_id": 804, "name": "BFM Paris Île-de-France", "category_id": "8", "url": TS_STREAM},
+    {"stream_id": 805, "name": "BFM Lyon", "category_id": "8", "url": TS_STREAM},
+    {"stream_id": 806, "name": "BFM Grand Lille", "category_id": "8", "url": TS_STREAM},
+    {"stream_id": 807, "name": "BFM Marseille Provence", "category_id": "8", "url": TS_STREAM},
+    {"stream_id": 808, "name": "CNews HD", "category_id": "8", "url": TS_STREAM},
+    {"stream_id": 809, "name": "LCI HD", "category_id": "8", "url": TS_STREAM},
+    {"stream_id": 810, "name": "France Info TV HD", "category_id": "8", "url": TS_STREAM},
+    {"stream_id": 811, "name": "France 24 Français HD", "category_id": "8", "url": "https://live.alarabiya.net/alarabiya/alarabiya.m3u8"},
+    {"stream_id": 812, "name": "France 24 Français SD", "category_id": "8", "url": "https://live.alarabiya.net/alarabiya/alarabiya.m3u8"},
+    {"stream_id": 813, "name": "Euronews Français HD", "category_id": "8", "url": TS_STREAM},
+    {"stream_id": 814, "name": "Public Sénat HD", "category_id": "8", "url": TS_STREAM},
+    {"stream_id": 815, "name": "LCP HD", "category_id": "8", "url": TS_STREAM},
+
+    # === 9. FR : GENERAL ===
+    {"stream_id": 901, "name": "TF1 HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 902, "name": "TF1 SD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 903, "name": "TF1 4K", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 904, "name": "TF1 +", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 905, "name": "TF1 Séries Films HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 906, "name": "France 2 HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 907, "name": "France 2 SD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 908, "name": "France 2 4K", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 909, "name": "France 3 National HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 910, "name": "France 3 Paris Île-de-France", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 911, "name": "France 3 Aquitaine", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 912, "name": "France 3 Provence-Alpes", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 913, "name": "France 3 Alpes", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 914, "name": "France 3 Alsace", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 915, "name": "France 4 HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 916, "name": "France 5 HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 917, "name": "M6 HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 918, "name": "M6 SD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 919, "name": "M6 4K", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 920, "name": "M6 +", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 921, "name": "Arte France HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 922, "name": "Arte France 4K", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 923, "name": "C8 France HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 924, "name": "W9 HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 925, "name": "TMC France HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 926, "name": "TFX HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 927, "name": "NRJ 12 HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 928, "name": "Culturebox HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 929, "name": "Canal+ France HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 930, "name": "Canal+ France 4K", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 931, "name": "Canal+ Cinéma(s) HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 932, "name": "Canal+ Grand Écran HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 933, "name": "Canal+ Box Office HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 934, "name": "Canal+ Box Office 4K", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 935, "name": "Canal+ Séries HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 936, "name": "Warner TV France HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 937, "name": "Paramount Channel France HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 938, "name": "Action TV France HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 939, "name": "TCM Cinéma France HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 940, "name": "Polar+ HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 941, "name": "Novelas TV France HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 942, "name": "Serieclub HD", "category_id": "9", "url": TS_STREAM},
+    {"stream_id": 943, "name": "TV Breizh HD", "category_id": "9", "url": TS_STREAM}
+]
+
+def validate_client(username, password):
+    return username in VALID_CREDENTIALS and VALID_CREDENTIALS[username] == password
+
+@app.route('/player_api.php')
+def player_api():
+    user = request.args.get("username")
+    pwd = request.args.get("password")
+    
+    if not validate_client(user, pwd):
+        return jsonify({"user_info": {"auth": 0}}), 403
+
+    action = request.args.get("action")
+    if not action:
+        return jsonify({
+            "user_info": {"username": user, "password": pwd, "auth": 1, "status": "Active", "exp_date": "1803744000", "is_trial": "0", "active_cons": "0", "max_connections": "5"},
+            "server_info": {"url": request.host, "port": "80", "https_port": "443", "server_time": str(int(time.time())), "timezone": "Africa/Algiers"}
+        })
+    elif action == "get_live_categories":
+        return jsonify(CATEGORIES)
+    elif action == "get_live_streams":
+        category_id = request.args.get("category_id")
+        streams = []
+        for ch in CHANNELS_DATA:
+            if category_id and ch["category_id"] != category_id: continue
+            streams.append({
+                "num": ch["stream_id"], "name": ch["name"], "stream_type": "live",
+                "stream_id": ch["stream_id"], "stream_icon": "",
+                "category_id": ch["category_id"], "added": "1611874800"
+            })
+        return jsonify(streams)
+    return jsonify([])
+
+@app.route('/live/<username>/<password>/<int:stream_id>.ts')
+@app.route('/live/<username>/<password>/<int:stream_id>')
+def stream_proxy(username, password, stream_id):
+    if not validate_client(username, password): return "Unauthorized", 403
+    target_channel = next((ch for ch in CHANNELS_DATA if ch["stream_id"] == stream_id), None)
+    if target_channel:
+        return Response(status=302, headers={"Location": target_channel["url"]})
+    return "Not Found", 404
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
